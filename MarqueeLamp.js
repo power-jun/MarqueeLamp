@@ -39,30 +39,30 @@ export default class MarqueeLabel extends Component {
     this.shouldFinish = true;
   }
 
-  containerWOnLayout(e) { // 当这个组件布局发生变化的时候，调用这个方法
+  containerWOnLayout(e) { // 当组件的布局发生变动的时候，会自动调用下面的方法
     this.containerWidth = e.nativeEvent.layout.width;
-    if (this.bgViewWidth !== 0) {
+    if (this.bgViewWidth) {
       this.prepareToAnimate();
     }
   }
 
   bgViewWOnLayout(e) {
     this.bgViewWidth = e.nativeEvent.layout.width;
-    if (this.containerWidth !== 0) {
+    if (this.containerWidth) {
       this.prepareToAnimate();
     }
   }
 
   containerHOnLayout(e) {
     this.containerHeight = e.nativeEvent.layout.height;
-    if (this.bgViewHidth !== 0) {
+    if (this.bgViewHidth) {
       this.prepareToAnimate();
     }
   }
 
   bgViewHOnLayout(e) {
     this.bgViewHidth = e.nativeEvent.layout.height;
-    if (this.containerHeight !== 0) {
+    if (this.containerHeight) {
       this.prepareToAnimate();
     }
   }
@@ -98,7 +98,7 @@ export default class MarqueeLabel extends Component {
     }
   }
 
-  levelAnimated() {
+  levelAnimated() { // 水平滚动动画
     Animated.timing(this.animateType, {
       toValue: -this.containerWidth,
       duration: this.duration,
@@ -111,7 +111,7 @@ export default class MarqueeLabel extends Component {
     });
   }
 
-  verticalAnimated() {
+  verticalAnimated() { // 垂直滚动动画
     Animated.timing(this.animateType, {
       toValue: -this.containerHeight,
       duration: this.duration,
@@ -126,21 +126,16 @@ export default class MarqueeLabel extends Component {
 
   render() {
     const {
-      children,
-      text,
-      bgViewStyle, // Backgound View Custom Styles
-      textStyle, // Text Custom Styles
-
-      // Text Container Width:
-      // to make the text shown in one line, this value should be larger than text width
-      textContainerWidth = 1000,
-
-      // Text Container Height:
-      // to make the text shown in one line, this value should be larger than text height
-      // usually increase this value when text has a large font size.
-      textContainerHeight = 100,
-
-      textContainerStyle // Text Container Custom Styles, not recommended to use
+      duration, // 一次动画的持续时间
+      speed, // 滚动速度
+      animateAirection, // 滚动方向
+      children, // 滚动View
+      text, // 滚动文本
+      bgViewStyle, // 外层View 样式
+      textStyle, // 如果是文本滚动，就需要文本样式 否则不需要传
+      // containerWidth, // 滚动内容的宽度
+      // containerHeight, // 滚动内容的高度
+      containerStyle // 滚动内容样式
     } = this.props;
 
     const { started } = this.state;
@@ -158,9 +153,7 @@ export default class MarqueeLabel extends Component {
       >
         <View
           style={{
-            ...styles.textContainerStyle,
-            width: textContainerWidth,
-            height: textContainerHeight,
+            ...styles.containerStyle,
             opacity: started ? 1 : 0
           }}
         >
@@ -195,7 +188,7 @@ export default class MarqueeLabel extends Component {
               }
             }}
           >
-            {children}
+            {text}
           </Animated.Text> }
         </View>
       </View>
@@ -209,11 +202,5 @@ const styles = {
     alignItems: 'center',
     justifyContent: 'flex-start',
     overflow: 'scroll',
-  },
-
-  textContainerStyle: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'flex-start'
   }
 };
